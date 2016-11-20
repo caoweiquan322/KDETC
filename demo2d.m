@@ -1,12 +1,12 @@
 %% Settings.
 miu_range = [0, 500];
-sigma_range = 0.8*[10, 30];
+sigma_range = 1.5*[10, 30];
 size_range = [200, 400];
-components_range = 2+[3, 8];
+components_range = 2+[3, 4];
 styles = {'r*', 'gs', 'k+'};
 d = 2;
 
-rng(5);
+rng(3);
 pred_protect_level = 10;
 
 %% Generate synthetic data.

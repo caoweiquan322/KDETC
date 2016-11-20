@@ -6,7 +6,7 @@ bw_y = diff(y_range)/num_grids;
 hist_k = zeros(num_grids+1, num_grids+1);
 sub_size = size(data2d, 1);
 x_idx = min(max(ceil((data2d(:,1)-x_range(1))/bw_x), 1), num_grids)+1;
-y_idx = min(max(ceil((data2d(:,1)-y_range(1))/bw_y), 1), num_grids)+1;
+y_idx = min(max(ceil((data2d(:,2)-y_range(1))/bw_y), 1), num_grids)+1;
 for i=1:sub_size
     hist_k(y_idx(i), x_idx(i)) = hist_k(y_idx(i), x_idx(i))+1;
 end
