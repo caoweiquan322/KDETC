@@ -1,4 +1,4 @@
-function [rects] = mdl_rectangles(data, finest_grid_size, min_num, protect_level)
+function [rects] = mdl_rectangles(data, finest_grid_size, min_num)
 
 %% Get initial partitions.
 [x_range, y_range, bw_x, bw_y, partition_x, partition_y, integrations] =...
@@ -19,7 +19,7 @@ for i=1:nx
                 partition_y(j,1), partition_y(j,2));
         end
         [sorted_N, sorted_idx] = sort(N, 1, 'descend');
-        if sorted_N(1) >= min_num && sorted_N(1)>protect_level*sorted_N(2)
+        if sorted_N(1) >= min_num && sorted_N(2)<min_num
             count = count+1;
             rects(count,:) = [partition_x(i,1), partition_x(i,2),...
                 partition_y(j,1), partition_y(j,2), sorted_idx(1)];

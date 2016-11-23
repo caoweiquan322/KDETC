@@ -1,6 +1,6 @@
 %% Settings.
 miu_range = [0, 500];
-sigma_range = 0.5*[10, 30];
+sigma_range = 1.5*[10, 30];
 size_range = [200, 400];
 components_range = 2+[3, 4];
 styles = {'r.', 'g.', 'k.'};
@@ -29,7 +29,7 @@ for k=1:num_classes
 end
 
 %% Get the optimal partitions.
-rects = mdl_rectangles(data, finest_grid_size, 20, 10);
+rects = mdl_rectangles(data, finest_grid_size, 20);
 
 %% Plot the clustering results.
 figure;

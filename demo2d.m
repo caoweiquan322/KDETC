@@ -3,7 +3,7 @@ miu_range = [0, 500];
 sigma_range = 1.5*[10, 30];
 size_range = [200, 400];
 components_range = 2+[3, 4];
-styles = {'r*', 'gs', 'k+'};
+styles = {'r.', 'g.', 'k.'};
 d = 2;
 
 rng(3);
