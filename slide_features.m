@@ -7,12 +7,12 @@ if length(xin) < win, sub_features = []; return; end
 n = length(xin);
 rows = floor((n-win+shift)/shift);
 sub_features = zeros(rows, 9);
-count = 1;
-for i=1:shift:n
-    f = fixed_feature(xin, yin, tin, win);
+count = 0;
+for i=1:shift:(n-win)
+    f = fixed_feature(xin(i:i+win-1), yin(i:i+win-1), tin(i:i+win-1), win);
     if isempty(f), continue; end
-    sub_features(count, :) = f;
     count = count+1;
+    sub_features(count, :) = f;
 end
 
 %% Check if the number of sub-features is valid.
