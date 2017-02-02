@@ -1,7 +1,7 @@
 
 %% Settings.
 MAX_INTERVAL = 10.0;
-MIN_LENGTH = 100;
+MIN_LENGTH = 1000;
 WND = round(MIN_LENGTH/2);
 SHIFT = round(WND/2);
 

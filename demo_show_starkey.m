@@ -1,5 +1,5 @@
 % Load stk variable.
-% stk = load('starkey.mat');
+stk = load('starkey.mat');
 
 % Plot specified year and month.
 month_fix = 7;
