@@ -1,41 +1,83 @@
-function demo_cv(stk)
+function demo_cv(dataset, dataname)
     % Load stk variable outside the function call.
-    % stk = load('starkey.mat');
+    % dataset = load('starkey.mat');
 
     % Set the specified year and month.
-    month_fix = 7;
+    if strcmp(dataname, 'starkey')
+        year_fix = 1995;
+        month_fix = 7;
+    else
+        year_fix = 2009;
+        month_fix = 7;
+    end
     days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     num_folds = 5;
-    num_repeat = 50;
+    num_repeat = 1;
     
     train_method = @kde_train;
     test_method = @kde_test;
 
     % The main procedure.
-    for year=1995
+    for year=year_fix
         for month = month_fix
             % Filter out the specified time range.
             day = days(month);
-            [id, t, label, x, y] = filter_starkey_by_month(stk.id, stk.t,...
-                stk.label, stk.x, stk.y, year, month, day);
+            if strcmp(dataname, 'starkey')
+                [id, t, label, x, y] = filter_starkey_by_month(dataset.id, dataset.t,...
+                    dataset.label, dataset.x, dataset.y, year, month, day);
+            else
+                id = dataset.id;
+                t = dataset.t;
+                label = dataset.label;
+                x = dataset.x;
+                y = dataset.y;
+%                 [id, t, label, x, y] = filter_AIS_by_month(dataset.id, dataset.t,...
+%                     dataset.label, dataset.x, dataset.y, year, month, day);
+            end
 
             % Re-organize the data as trajectories.
             trajs = organize_starkey(id, t, label, x, y);
             num_trajs = size(trajs, 1);
             Y = zeros(num_trajs, 1);
+            if strcmp(dataname, 'starkey')
+                cared_classes = {'"C"'; '"D"'; '"E"'};
+            elseif strcmp(dataname, 'ais_flags')
+                cared_classes = {'BM'; 'NO'; 'FR'};
+            else
+                cared_classes = {'Anchor Handling Vessel'; 'Research/Survey Vessel'; 'Trailing Suction Hopper Dredger'};
+            end
+            num_classes = size(cared_classes, 1);
             for i=1:num_trajs
-                if strcmp('"C"', trajs{i, 2})
-                    Y(i) = 1;
-                elseif strcmp('"D"', trajs{i, 2})
-                    Y(i) = 2;
-                elseif strcmp('"E"', trajs{i, 2})
-                    Y(i) = 3;
-                else
-                    fprintf('Unrecognized label type: %s\n', trajs{i, 2});
+                for k=1:num_classes
+                    if strcmp(cared_classes{k}, trajs{i, 2})
+                        Y(i) = k;
+                        break;
+                    end
                 end
             end
+            cared_idx = Y~=0;
+            trajs = trajs(cared_idx, :);
+            Y = Y(cared_idx, :);
+            num_trajs = size(trajs, 1);
+            if ~strcmp(dataname, 'starkey')
+                for i=1:num_trajs
+                    trajs{i, 3} = trajs{i, 3}(1:20:end, :);
+                end
+            end
+            fprintf('Number of test samples is %d.\n', num_trajs);
             
-            performance = zeros(num_repeat, 3);
+            % Visualize.
+            figure;
+            hold on;
+            styles = {'+r-', 'xg-', 'ok-'};
+            for i=1:num_trajs
+                plot(trajs{i, 3}(:, 1), trajs{i, 3}(:, 2), styles{strcmp(trajs{i, 2}, cared_classes)});
+            end
+            legend(cared_classes);
+            pause;
+            
+            % Do cross validating.
+            performance = zeros(num_repeat, num_classes);
             for n=1:num_repeat
                 % Partition into train/test sub-set.
                 total_idx = randperm(num_trajs);
@@ -45,13 +87,13 @@ function demo_cv(stk)
 
                 % Training.
                 tic;
-                %model = mdl_rect_train(trajs(train_idx', :), Y(train_idx'), 3);
-                model = train_method(trajs(train_idx', :), Y(train_idx'), 3);
+                %model = mdl_rect_train(trajs(train_idx', :), Y(train_idx'), num_classes);
+                model = train_method(trajs(train_idx', :), Y(train_idx'), num_classes);
                 train_time = toc;
                 % Testing
                 tic;
-                %correct_rate = mdl_rect_test(model, trajs(test_idx', :), Y(test_idx'), 3);
-                correct_rate = test_method(model, trajs(test_idx', :), Y(test_idx'), 3);
+                %correct_rate = mdl_rect_test(model, trajs(test_idx', :), Y(test_idx'), num_classes);
+                correct_rate = test_method(model, trajs(test_idx', :), Y(test_idx'), num_classes);
                 test_time = toc;
                 % Collect the results.
                 performance(n, :) = [train_time, test_time, correct_rate];
